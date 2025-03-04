@@ -1,0 +1,17 @@
+{
+  "name": "concentrix-salary-calculator",
+  "version": "1.0.0",
+  "description": "Salary calculator for Concentrix employees",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "salary",
+    "calculator",
+    "concentrix",
+    "tunisia"
+  ],
+  "author": "YOUR_NAME",
+  "license": "MIT"
+}

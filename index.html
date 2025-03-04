@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-translate="title">Concentrix Salary Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="language-switcher">
+        <button id="langEN" class="lang-btn active">English</button>
+        <button id="langFR" class="lang-btn">Français</button>
+    </div>
+
+    <div class="container">
+        <h1 data-translate="title">Concentrix Salary Calculator</h1>
+        <div class="calculator-box">
+            <form id="salaryForm">
+                <!-- Base Components -->
+                <div class="section">
+                    <h3 data-translate="baseComponents">Base Components</h3>
+                    <div class="input-group">
+                        <label for="baseSalary" data-translate="baseSalary">Base Salary:</label>
+                        <input type="number" id="baseSalary" required placeholder="Enter base salary" step="0.001">
+                    </div>
+                    <div class="input-group">
+                        <label for="absenceDays" data-translate="absenceDays">Absence Days:</label>
+                        <input type="number" id="absenceDays" value="0" min="0" max="22" step="1">
+                    </div>
+                    <div class="input-group checkbox-group">
+                        <label for="halftimeRegime">
+                            <input type="checkbox" id="halftimeRegime">
+                            <span data-translate="halftimeRegime">HalfTime Regime</span>
+                        </label>
+                    </div>
+                    <div class="input-group seniority-group">
+                        <label data-translate="seniority">Seniority:</label>
+                        <div class="seniority-inputs">
+                            <div class="seniority-input">
+                                <input type="number" id="seniorityYears" min="0" placeholder="Years" step="1">
+                                <span data-translate="years">Years</span>
+                            </div>
+                            <div class="seniority-input">
+                                <input type="number" id="seniorityMonths" min="0" max="11" placeholder="Months" step="1">
+                                <span data-translate="months">Months</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Fixed Allowances -->
+                <div class="section">
+                    <h3 data-translate="fixedAllowances">Fixed Allowances</h3>
+                    <div class="input-group">
+                        <label for="transport" data-translate="transportAllowance">Transport Allowance (Fixed):</label>
+                        <input type="number" id="transport" value="20.000" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label for="presence" data-translate="presenceAllowance">Presence Allowance (Fixed):</label>
+                        <input type="number" id="presence" value="6.080" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label for="attendanceBonus" data-translate="attendanceBonus">Attendance Bonus:</label>
+                        <input type="number" id="attendanceBonus" value="190.000" readonly>
+                    </div>
+                </div>
+
+                <!-- Bonuses -->
+                <div class="section">
+                    <h3 data-translate="bonuses">Bonuses</h3>
+                    <div class="input-group">
+                        <label for="languageBonus" data-translate="languageBonus">Language Bonus:</label>
+                        <select id="languageBonus" class="select-input">
+                            <option value="0" data-translate="frenchOnly">French Only</option>
+                            <option value="250" data-translate="englishOnly">English Only</option>
+                            <option value="300" data-translate="englishFrench">English + French</option>
+                            <option value="400" data-translate="otherLanguages">Other Languages</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="publicHolidays" data-translate="publicHolidays">Paid Public Holidays (1-5 days):</label>
+                        <select id="publicHolidays" class="select-input">
+                            <option value="0">0</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="nightShiftHours" data-translate="nightShiftHours">Night Shift Hours:</label>
+                        <input type="number" id="nightShiftHours" value="0" min="0" step="1">
+                    </div>
+                    <div class="input-group">
+                        <label for="productivityBonus" data-translate="productivityBonus">Productivity Bonus:</label>
+                        <select id="productivityBonus" class="select-input">
+                            <option value="0.15">15%</option>
+                            <option value="0.165">16.5%</option>
+                            <option value="0.18">18%</option>
+                            <option value="0.20">20%</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label for="sundaysWorked" data-translate="sundaysWorked">Number of Sundays Worked (25 TND/Sunday):</label>
+                        <input type="number" id="sundaysWorked" value="0" min="0" max="4" step="1">
+                    </div>
+                </div>
+
+                <!-- Automatic Allowances -->
+                <div class="section">
+                    <h3 data-translate="automaticAllowances">Automatic Allowances</h3>
+                    <div class="input-group">
+                        <label for="mealAllowance" data-translate="mealAllowance">Meal Allowance (6.7 TND × Working Days):</label>
+                        <input type="number" id="mealAllowance" readonly>
+                    </div>
+                    <div class="input-group">
+                        <label for="groupInsurance" data-translate="groupInsurance">Group Insurance (7.55% of Total Income):</label>
+                        <input type="number" id="groupInsurance" readonly>
+                    </div>
+                </div>
+
+                <button type="submit" class="calculate-btn" data-translate="calculate">Calculate Salary</button>
+            </form>
+
+            <!-- Results Section -->
+            <div class="result" id="result">
+                <h2 data-translate="salaryBreakdown">Salary Breakdown</h2>
+                <div class="result-item">
+                    <span data-translate="grossSalary">Gross Salary:</span>
+                    <span id="grossSalary">0.000 TND</span>
+                </div>
+                <div class="result-item">
+                    <span data-translate="cnssContribution">CNSS Contribution (9.68%):</span>
+                    <span id="cnssContribution">0.000 TND</span>
+                </div>
+                <div class="result-item">
+                    <span data-translate="taxableSalary">Taxable Salary:</span>
+                    <span id="taxableSalary">0.000 TND</span>
+                </div>
+                <div class="result-item">
+                    <span data-translate="irppTax">IRPP Tax:</span>
+                    <span id="irppTax">0.000 TND</span>
+                </div>
+                <div class="result-item">
+                    <span data-translate="cssContribution">CSS (0.45%):</span>
+                    <span id="cssContribution">0.000 TND</span>
+                </div>
+                <div class="result-item">
+                    <span data-translate="totalDeductions">Total Deductions:</span>
+                    <span id="totalDeductions">0.000 TND</span>
+                </div>
+                <div class="result-item">
+                    <span data-translate="netSalary">Net Salary:</span>
+                    <span id="netSalary">0.000 TND</span>
+                </div>
+                <div class="result-item highlight">
+                    <span data-translate="finalNetPayable">Final Net Payable:</span>
+                    <span id="netPayable">0.000 TND</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
