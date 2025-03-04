@@ -51,3 +51,15 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
+
+## Version History
+
+### v1.0.1 (Current)
+- Added bilingual support (English/French)
+- Added footer with version information
+- Improved UI with language switcher
+
+### v1.0.0
+- Initial release
+- Basic salary calculation features
+- Support for various allowances and bonuses

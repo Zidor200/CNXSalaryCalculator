@@ -56,7 +56,9 @@ const translations = {
         cssContribution: "CSS (0.45%)",
         totalDeductions: "Total Deductions",
         netSalary: "Net Salary",
-        finalNetPayable: "Final Net Payable"
+        finalNetPayable: "Final Net Payable",
+        version: "Version: 1.0.1",
+        copyright: "© 2025 Oussema Ouchikh. All rights reserved."
     },
     fr: {
         title: "Calculateur de Salaire Concentrix",
@@ -93,7 +95,9 @@ const translations = {
         cssContribution: "CSS (0.45%)",
         totalDeductions: "Total des Retenues",
         netSalary: "Salaire Net",
-        finalNetPayable: "Net à Payer"
+        finalNetPayable: "Net à Payer",
+        version: "Version: 1.0.1",
+        copyright: "© 2025 Oussema Ouchikh. Tous droits réservés."
     }
 };
 

@@ -318,3 +318,18 @@ input:focus, select:focus {
     background: #2980b9;
     color: white;
 }
+
+/* Add this to your existing CSS */
+.footer {
+    margin-top: 40px;
+    padding: 20px 0;
+    background-color: #f8f9fa;
+    border-top: 1px solid #eee;
+    text-align: center;
+}
+
+.footer p {
+    margin: 5px 0;
+    color: #666;
+    font-size: 0.9rem;
+}
