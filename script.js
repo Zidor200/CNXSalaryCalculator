@@ -97,7 +97,7 @@ const translations = {
     }
 };
 
-// Helper function to format numbers
+// Add the formatNumber function
 function formatNumber(number) {
     return number.toFixed(3);
 }
@@ -181,49 +181,68 @@ function debugIRPP(monthlyTaxableIncome) {
     console.log(`Annual IRPP: ${(monthlyIRPP * 12).toFixed(3)} TND`);
 }
 
-// Main calculation function
+// Add this helper function at the top of your file
+function safeGetElementValue(id, defaultValue = 0) {
+    const element = document.getElementById(id);
+    if (!element) return defaultValue;
+    return parseFloat(element.value) || defaultValue;
+}
+
+// Add this helper function for updating elements safely
+function safeUpdateElement(id, value, isInput = false) {
+    const element = document.getElementById(id);
+    if (!element) return;
+    if (isInput) {
+        element.value = value;
+    } else {
+        element.textContent = value;
+    }
+}
+
+// Update your calculateSalary function
 function calculateSalary() {
-    // Get input values
-    const baseSalary = parseFloat(document.getElementById('baseSalary').value) || 0;
-    const absenceDays = parseInt(document.getElementById('absenceDays').value) || 0;
-    const isHalftime = document.getElementById('halftimeRegime').checked;
-    const seniorityYears = parseInt(document.getElementById('seniorityYears').value) || 0;
-    const seniorityMonths = parseInt(document.getElementById('seniorityMonths').value) || 0;
-    const languageBonus = parseFloat(document.getElementById('languageBonus').value) || 0;
-    const publicHolidays = parseInt(document.getElementById('publicHolidays').value) || 0;
-    const nightShiftHours = parseInt(document.getElementById('nightShiftHours').value) || 0;
-    const productivityRate = parseFloat(document.getElementById('productivityBonus').value) || 0;
-    const sundaysWorked = parseInt(document.getElementById('sundaysWorked').value) || 0;
+    console.log('Calculating salary...'); // Debug line
+
+    // Get input values safely
+    const baseSalary = safeGetElementValue('baseSalary');
+    const absenceDays = safeGetElementValue('absenceDays');
+    const isHalftime = document.getElementById('halftimeRegime')?.checked || false;
+    const seniorityYears = safeGetElementValue('seniorityYears');
+    const seniorityMonths = safeGetElementValue('seniorityMonths');
+    const languageBonus = safeGetElementValue('languageBonus');
+    const publicHolidays = safeGetElementValue('publicHolidays');
+    const nightShiftHours = safeGetElementValue('nightShiftHours');
+    const productivityRate = safeGetElementValue('productivityBonus');
+    const sundaysWorked = safeGetElementValue('sundaysWorked');
 
     // Calculate regime multiplier
     const regime = isHalftime ? 0.5 : 1;
 
     // Apply regime to base salary and related calculations
     const adjustedBaseSalary = baseSalary * regime;
-    const WORKING_DAYS = 22* regime;
-    // Calculate total seniority in months
+    const WORKING_DAYS = 22 * regime;
     const totalMonths = (seniorityYears * 12) + seniorityMonths;
 
-    // Calculate daily rate using adjusted base salary
+    // Calculate rates
     const dailyRate = (adjustedBaseSalary + TRANSPORT_ALLOWANCE + PRESENCE_ALLOWANCE) / WORKING_DAYS;
-
-    // Calculate hourly rate (daily rate / 8)
     const hourlyRate = dailyRate / 8;
 
-    // Calculate allowances and bonuses with regime adjustment
+    // Calculate allowances and bonuses
     const attendanceBonus = absenceDays > 0 ? 0 : (ATTENDANCE_BONUS * regime);
     const publicHolidaysAmount = dailyRate * publicHolidays;
     const nightShiftBonus = hourlyRate * nightShiftHours;
     const productivityBonus = adjustedBaseSalary * productivityRate;
     const mealAllowance = MEAL_ALLOWANCE_DAILY * (WORKING_DAYS - absenceDays);
-
-    // Calculate total Sundays bonus (25 TND per Sunday)
     const sundaysBonus = SUNDAY_RATE * sundaysWorked;
 
-    // Update Sunday bonus display
-    document.getElementById('sundayRate').textContent = formatNumber(sundaysBonus) + ' TND';
+    // Update displays safely
+    safeUpdateElement('sundayRate', formatNumber(sundaysBonus) + ' TND');
+    safeUpdateElement('holidayRate', formatNumber(dailyRate) + ' TND');
+    safeUpdateElement('nightShiftRate', formatNumber(hourlyRate) + ' TND');
+    safeUpdateElement('mealAllowance', formatNumber(mealAllowance), true);
+    safeUpdateElement('productivityAmount', formatNumber(productivityBonus) + ' TND');
 
-    // Calculate total income before group insurance
+    // Calculate total income
     const totalIncome = adjustedBaseSalary +
         TRANSPORT_ALLOWANCE +
         PRESENCE_ALLOWANCE +
@@ -235,74 +254,61 @@ function calculateSalary() {
         mealAllowance +
         sundaysBonus;
 
-    // Calculate group insurance based on total income if eligible
+    // Calculate group insurance
     const groupInsurance = totalMonths >= 9 ? totalIncome * GROUP_INSURANCE_RATE : 0;
+    safeUpdateElement('groupInsurance', formatNumber(groupInsurance), true);
 
-    // Update group insurance display and disable if not eligible
+    // Update insurance note if needed
     const groupInsuranceInput = document.getElementById('groupInsurance');
-    groupInsuranceInput.value = formatNumber(groupInsurance);
-    if (totalMonths < 9) {
-        groupInsuranceInput.classList.add('disabled');
-        if (!document.getElementById('insuranceNote')) {
-            const noteDiv = document.createElement('div');
-            noteDiv.id = 'insuranceNote';
-            noteDiv.className = 'insurance-note';
-            noteDiv.textContent = 'Group Insurance requires 9 months seniority';
-            groupInsuranceInput.parentNode.appendChild(noteDiv);
+    if (groupInsuranceInput) {
+        if (totalMonths < 9) {
+            groupInsuranceInput.classList.add('disabled');
+            if (!document.getElementById('insuranceNote')) {
+                const noteDiv = document.createElement('div');
+                noteDiv.id = 'insuranceNote';
+                noteDiv.className = 'insurance-note';
+                noteDiv.textContent = 'Group Insurance requires 9 months seniority';
+                groupInsuranceInput.parentNode.appendChild(noteDiv);
+            }
+        } else {
+            groupInsuranceInput.classList.remove('disabled');
+            const note = document.getElementById('insuranceNote');
+            if (note) note.remove();
         }
-    } else {
-        groupInsuranceInput.classList.remove('disabled');
-        const note = document.getElementById('insuranceNote');
-        if (note) note.remove();
     }
 
+    // Calculate final values
     const absenceDeduction = dailyRate * absenceDays;
-
-    // Calculate Gross Salary
     const grossSalary = totalIncome + groupInsurance - absenceDeduction;
-
-    // Calculate CNSS base (Gross Salary - Automatic Allowances)
     const cnssBase = grossSalary - (mealAllowance + groupInsurance);
     const cnssContribution = cnssBase * CNSS_RATE;
-
-    // Calculate Taxable Salary
     const taxableSalary = grossSalary - cnssContribution;
-
-    // Calculate IRPP and CSS
     const irppTax = calculateIRPP(taxableSalary * 12);
     const cssContribution = taxableSalary * CSS_RATE;
-
-    // Calculate Total Deductions
     const totalDeductions = cnssContribution + irppTax + cssContribution;
-
-    // Calculate Net Salary
     const netSalary = grossSalary - totalDeductions;
+    const netPayable = netSalary - (mealAllowance + groupInsurance);
 
-    // Calculate Final Net Payable
-    const automaticAllowances = mealAllowance + groupInsurance;
-    const netPayable = netSalary - automaticAllowances;
-
-    // Update displays
-    document.getElementById('holidayRate').textContent = formatNumber(dailyRate) + ' TND';
-    document.getElementById('nightShiftRate').textContent = formatNumber(hourlyRate) + ' TND';
-    document.getElementById('mealAllowance').value = formatNumber(mealAllowance);
-    document.getElementById('productivityAmount').textContent = formatNumber(productivityBonus) + ' TND';
-
-    // Update results
-    document.getElementById('grossSalary').textContent = formatNumber(grossSalary) + ' TND';
-    document.getElementById('cnssContribution').textContent = formatNumber(cnssContribution) + ' TND';
-    document.getElementById('taxableSalary').textContent = formatNumber(taxableSalary) + ' TND';
-    document.getElementById('irppTax').textContent = formatNumber(irppTax) + ' TND';
-    document.getElementById('cssContribution').textContent = formatNumber(cssContribution) + ' TND';
-    document.getElementById('totalDeductions').textContent = formatNumber(totalDeductions) + ' TND';
-    document.getElementById('netSalary').textContent = formatNumber(netSalary) + ' TND';
-    document.getElementById('netPayable').textContent = formatNumber(netPayable) + ' TND';
+    // Update results safely
+    safeUpdateElement('grossSalary', formatNumber(grossSalary) + ' TND');
+    safeUpdateElement('cnssContribution', formatNumber(cnssContribution) + ' TND');
+    safeUpdateElement('taxableSalary', formatNumber(taxableSalary) + ' TND');
+    safeUpdateElement('irppTax', formatNumber(irppTax) + ' TND');
+    safeUpdateElement('cssContribution', formatNumber(cssContribution) + ' TND');
+    safeUpdateElement('totalDeductions', formatNumber(totalDeductions) + ' TND');
+    safeUpdateElement('netSalary', formatNumber(netSalary) + ' TND');
+    safeUpdateElement('netPayable', formatNumber(netPayable) + ' TND');
 }
 
-// Event Listeners
-document.getElementById('salaryForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    calculateSalary();
+// Make sure the form submission is properly handled
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('salaryForm');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateSalary();
+        });
+    }
 });
 
 // Update the baseSalary event listener to remove Sunday rate update since it's now fixed
@@ -410,19 +416,14 @@ function changeLanguage(lang) {
     document.getElementById('lang' + lang.toUpperCase()).classList.add('active');
 }
 
-// Add these event listeners at the end of your script.js file
-document.addEventListener('DOMContentLoaded', function() {
-    // Add click event listeners for language buttons
-    document.getElementById('langEN').addEventListener('click', function() {
-        console.log('English button clicked'); // Debug log
-        changeLanguage('en');
-    });
-
-    document.getElementById('langFR').addEventListener('click', function() {
-        console.log('French button clicked'); // Debug log
-        changeLanguage('fr');
-    });
-
-    // Initialize with English
+// Add language switcher event listeners
+document.getElementById('langEN').addEventListener('click', function() {
     changeLanguage('en');
 });
+
+document.getElementById('langFR').addEventListener('click', function() {
+    changeLanguage('fr');
+});
+
+// Initialize with English
+changeLanguage('en');
