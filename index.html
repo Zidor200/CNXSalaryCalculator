@@ -61,7 +61,10 @@
                     </div>
                     <div class="input-group">
                         <label for="attendanceBonus" data-translate="attendanceBonus">Attendance Bonus:</label>
-                        <input type="number" id="attendanceBonus" value="190.000" readonly>
+                        <div class="bonus-display">
+                            <input type="number" id="attendanceBonus" value="190.000" readonly>
+                            <span class="bonus-status" id="bonusStatus"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -95,8 +98,10 @@
                     <div class="input-group">
                         <label for="productivityBonus" data-translate="productivityBonus">Productivity Bonus:</label>
                         <select id="productivityBonus" class="select-input">
+                            <option value="0">0%</option>
                             <option value="0.15">15%</option>
                             <option value="0.165">16.5%</option>
+
                             <option value="0.18">18%</option>
                             <option value="0.20">20%</option>
                         </select>
@@ -105,6 +110,10 @@
                         <label for="sundaysWorked" data-translate="sundaysWorked">Number of Sundays Worked (25 TND/Sunday):</label>
                         <input type="number" id="sundaysWorked" value="0" min="0" max="4" step="1">
                         <div id="sundayRate" class="calculated-value">0.000 TND</div>
+                    </div>
+                    <div class="input-group">
+                        <label data-translate="seniorityBonus">Seniority Bonus:</label>
+                        <div id="seniorityBonusAmount" class="calculated-value">0.000 TND</div>
                     </div>
                 </div>
 
@@ -164,7 +173,7 @@
     </div>
     <footer class="footer">
         <div class="container">
-            <p data-translate="version">Version: 1.0.1</p>
+            <p data-translate="version">Version: 1.0.3</p>
             <p data-translate="copyright">© 2025 Oussema Ouchikh. All rights reserved.</p>
         </div>
     </footer>

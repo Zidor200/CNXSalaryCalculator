@@ -83,10 +83,7 @@ input:focus, select:focus {
     padding: 8px 12px;
     border-radius: 4px;
     color: #666;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: clamp(0.9rem, 2.5vw, 1rem);
+    font-weight: bold;
 }
 
 .calculate-btn {
@@ -332,4 +329,39 @@ input:focus, select:focus {
     margin: 5px 0;
     color: #666;
     font-size: 0.9rem;
+}
+
+/* Add these styles for the attendance bonus display */
+.bonus-display {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.bonus-status {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+}
+
+.bonus-active {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.bonus-inactive {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+input[readonly].bonus-warning {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+
+input[readonly].bonus-success {
+    background-color: #e8f5e9;
+    border-color: #c8e6c9;
 }

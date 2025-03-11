@@ -57,8 +57,11 @@ const translations = {
         totalDeductions: "Total Deductions",
         netSalary: "Net Salary",
         finalNetPayable: "Final Net Payable",
-        version: "Version: 1.0.1",
-        copyright: "© 2025 Oussema Ouchikh. All rights reserved."
+        version: "Version: 1.0.3",
+        copyright: "© 2025 Oussema Ouchikh. All rights reserved.",
+        seniorityBonus: "Seniority Bonus:",
+        bonusActive: "Active",
+        bonusInactive: "Inactive (Absences)"
     },
     fr: {
         title: "Calculateur de Salaire Concentrix",
@@ -96,8 +99,11 @@ const translations = {
         totalDeductions: "Total des Retenues",
         netSalary: "Salaire Net",
         finalNetPayable: "Net à Payer",
-        version: "Version: 1.0.1",
-        copyright: "© 2025 Oussema Ouchikh. Tous droits réservés."
+        version: "Version: 1.0.3",
+        copyright: "© 2025 Oussema Ouchikh. Tous droits réservés.",
+        seniorityBonus: "Prime d'Ancienneté:",
+        bonusActive: "Actif",
+        bonusInactive: "Inactif (Absences)"
     }
 };
 
@@ -203,7 +209,16 @@ function safeUpdateElement(id, value, isInput = false) {
     }
 }
 
-// Update your calculateSalary function
+// Function to calculate seniority bonus
+function calculateSeniorityBonus(years) {
+    if (years < 3) return 0;
+    // Base bonus of 30 TND for 3 years
+    // Add 5 TND for each additional year
+    const additionalYears = years - 3;
+    return 30 + (Math.trunc(additionalYears) * 5);
+}
+
+// Update the calculateSalary function
 function calculateSalary() {
     console.log('Calculating salary...'); // Debug line
 
@@ -239,6 +254,13 @@ function calculateSalary() {
     const mealAllowance = MEAL_ALLOWANCE_DAILY * (WORKING_DAYS - absenceDays);
     const sundaysBonus = SUNDAY_RATE * sundaysWorked;
 
+    // Calculate total seniority in years
+    const totalYears = seniorityYears + (seniorityMonths / 12);
+    const seniorityBonus = calculateSeniorityBonus(totalYears);
+
+    // Update seniority bonus display
+    document.getElementById('seniorityBonusAmount').textContent = formatNumber(seniorityBonus) + ' TND';
+
     // Update displays safely
     safeUpdateElement('sundayRate', formatNumber(sundaysBonus) + ' TND');
     safeUpdateElement('holidayRate', formatNumber(dailyRate) + ' TND');
@@ -256,7 +278,8 @@ function calculateSalary() {
         nightShiftBonus +
         productivityBonus +
         mealAllowance +
-        sundaysBonus;
+        sundaysBonus +
+        seniorityBonus;
 
     // Calculate group insurance
     const groupInsurance = totalMonths >= 9 ? totalIncome * GROUP_INSURANCE_RATE : 0;
@@ -313,6 +336,39 @@ document.addEventListener('DOMContentLoaded', function() {
             calculateSalary();
         });
     }
+
+    const absenceDaysInput = document.getElementById('absenceDays');
+    const attendanceBonusInput = document.getElementById('attendanceBonus');
+    const bonusStatus = document.getElementById('bonusStatus');
+
+    function updateAttendanceBonus() {
+        const absenceDays = parseInt(absenceDaysInput.value) || 0;
+        const bonusAmount = absenceDays > 0 ? 0 : ATTENDANCE_BONUS;
+
+        // Update the bonus amount
+        attendanceBonusInput.value = formatNumber(bonusAmount);
+
+        // Update visual status
+        if (absenceDays > 0) {
+            attendanceBonusInput.classList.remove('bonus-success');
+            attendanceBonusInput.classList.add('bonus-warning');
+            bonusStatus.textContent = 'Inactive (Absences)';
+            bonusStatus.classList.remove('bonus-active');
+            bonusStatus.classList.add('bonus-inactive');
+        } else {
+            attendanceBonusInput.classList.remove('bonus-warning');
+            attendanceBonusInput.classList.add('bonus-success');
+            bonusStatus.textContent = 'Active';
+            bonusStatus.classList.remove('bonus-inactive');
+            bonusStatus.classList.add('bonus-active');
+        }
+    }
+
+    // Initialize the bonus status
+    updateAttendanceBonus();
+
+    // Update when absence days change
+    absenceDaysInput.addEventListener('input', updateAttendanceBonus);
 });
 
 // Update the baseSalary event listener to remove Sunday rate update since it's now fixed
