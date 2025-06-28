@@ -54,7 +54,17 @@ Pull requests are welcome. For major changes, please open an issue first to disc
 
 ## Version History
 
-### v1.0.1 (Current)
+### v1.0.3 (Current)
+- Added visual feedback for attendance bonus status
+- Improved absence days interaction
+- Enhanced UI feedback for bonus calculations
+
+### v1.0.2
+- Added seniority bonus calculation
+- Added 0% option for productivity bonus
+- Updated bonus calculations
+
+### v1.0.1
 - Added bilingual support (English/French)
 - Added footer with version information
 - Improved UI with language switcher

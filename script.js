@@ -61,7 +61,15 @@ const translations = {
         copyright: "© 2025 Oussema Ouchikh. All rights reserved.",
         seniorityBonus: "Seniority Bonus:",
         bonusActive: "Active",
-        bonusInactive: "Inactive (Absences)"
+        bonusInactive: "Inactive (Absences)",
+        married: "Married",
+        children: "Number of Children:",
+        specialBonus: "Special Bonus:",
+        selectSpecialBonus: "Select Special Bonus",
+        bonusAdha: "Prime Aid el Adha (300 DT)",
+        bonusRamadan: "Prime Ramadan (100 DT)",
+        bonusScholarship: "Prime Scholarship (150 DT/child)",
+        specialAddons: "Special Addons (missed old bonus, mistakes, parrainage, etc.):"
     },
     fr: {
         title: "Calculateur de Salaire Concentrix",
@@ -103,7 +111,15 @@ const translations = {
         copyright: "© 2025 Oussema Ouchikh. Tous droits réservés.",
         seniorityBonus: "Prime d'Ancienneté:",
         bonusActive: "Actif",
-        bonusInactive: "Inactif (Absences)"
+        bonusInactive: "Inactif (Absences)",
+        married: "Marié(e)",
+        children: "Nombre d'enfants:",
+        specialBonus: "Prime Spéciale:",
+        selectSpecialBonus: "Sélectionner une prime spéciale",
+        bonusAdha: "Prime Aid el Adha (300 DT)",
+        bonusRamadan: "Prime Ramadan (100 DT)",
+        bonusScholarship: "Prime Scolarité (150 DT/enfant)",
+        specialAddons: "Ajouts spéciaux (ancienne prime manquée, erreurs, parrainage, etc.) :"
     }
 };
 
@@ -234,6 +250,20 @@ function calculateSalary() {
     const productivityRate = safeGetElementValue('productivityBonus');
     const sundaysWorked = safeGetElementValue('sundaysWorked');
 
+    // New: Get married and children values
+    const isMarried = document.getElementById('marriedCheckbox')?.checked || false;
+    const childrenCount = safeGetElementValue('childrenCount');
+
+    // Special bonuses
+    const bonusAdha = document.getElementById('bonusAdha')?.checked ? 300 : 0;
+    const bonusRamadan = document.getElementById('bonusRamadan')?.checked ? 100 : 0;
+    let bonusScholarship = 0;
+    if (document.getElementById('bonusScholarship')?.checked && childrenCount > 0) {
+        bonusScholarship = 150 * childrenCount;
+    }
+    // Special Addons
+    const specialAddons = safeGetElementValue('specialAddons');
+
     // Calculate regime multiplier
     const regime = isHalftime ? 0.5 : 1;
 
@@ -279,7 +309,11 @@ function calculateSalary() {
         productivityBonus +
         mealAllowance +
         sundaysBonus +
-        seniorityBonus;
+        seniorityBonus +
+        bonusAdha +
+        bonusRamadan +
+        bonusScholarship +
+        specialAddons;
 
     // Calculate group insurance
     const groupInsurance = totalMonths >= 9 ? totalIncome * GROUP_INSURANCE_RATE : 0;
@@ -310,7 +344,14 @@ function calculateSalary() {
     const cnssBase = grossSalary - (mealAllowance + groupInsurance);
     const cnssContribution = cnssBase * CNSS_RATE;
     const taxableSalary = grossSalary - cnssContribution;
-    const irppTax = calculateIRPP(taxableSalary * 12);
+
+    // Apply reductions for married and children before IRPP calculation
+    let adjustedAnnualTaxableSalary = taxableSalary * 12;
+    if (isMarried) adjustedAnnualTaxableSalary -= 300;
+    adjustedAnnualTaxableSalary -= (childrenCount * 100);
+    if (adjustedAnnualTaxableSalary < 0) adjustedAnnualTaxableSalary = 0;
+
+    const irppTax = calculateIRPP(adjustedAnnualTaxableSalary);
     const cssContribution = taxableSalary * CSS_RATE;
     const totalDeductions = cnssContribution + irppTax + cssContribution;
     const netSalary = grossSalary - totalDeductions;
@@ -487,3 +528,22 @@ document.getElementById('langFR').addEventListener('click', function() {
 
 // Initialize with English
 changeLanguage('en');
+
+// Dropdown toggle logic for special bonuses
+function setupSpecialBonusDropdown() {
+    const toggle = document.getElementById('specialBonusToggle');
+    const menu = document.getElementById('specialBonusMenu');
+    if (toggle && menu) {
+        toggle.addEventListener('click', function(e) {
+            e.stopPropagation();
+            menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+        });
+        // Hide dropdown when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!menu.contains(e.target) && e.target !== toggle) {
+                menu.style.display = 'none';
+            }
+        });
+    }
+}
+document.addEventListener('DOMContentLoaded', setupSpecialBonusDropdown);
